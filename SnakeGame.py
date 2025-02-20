@@ -2,7 +2,7 @@ import pygame
 import random
 pygame.init()
 
-largura_tela = 500
+largura_tela = 700
 altura_tela = 500
 tela = pygame.display.set_mode((largura_tela, altura_tela))
 
@@ -13,6 +13,7 @@ BRANCO = (255, 255, 255)
 VERDE = (0, 255, 0)
 VERDE_ESCURO = (0, 150, 0)  # Cor mais escura para a sombra
 VERMELHO = (255, 0, 0)
+CINZA = (128, 128, 128)
 
 cobra = [(200, 200), (220, 200), (240, 200)]  # Posição inicial da cobra
 
@@ -20,8 +21,21 @@ cobra = [(200, 200), (220, 200), (240, 200)]  # Posição inicial da cobra
 novo_x = 20
 novo_y = 0
 
-def nova_bolinha():
-    return (random.randrange(0, largura_tela, 20), random.randrange(0, altura_tela, 20))
+def nova_bolinha(obstaculos):
+
+    comida_ocupada = False
+    comida = (random.randrange(40, largura_tela, 20), random.randrange(40, altura_tela, 20)) # COmeça a paritr do 40,40 pra não sobressair o placar
+        
+    for obstaculo in obstaculos:
+       for bloco in obstaculo:
+            if comida == bloco:
+                comida_ocupada = True
+        
+    if comida_ocupada:
+        return nova_bolinha (obstaculos)
+    else:
+        return comida
+
 
 def novo_obstaculo():
     
@@ -39,8 +53,9 @@ def novo_obstaculo():
 
     return obstaculos
 
-bolinha = nova_bolinha()
 obstaculos = [novo_obstaculo(), novo_obstaculo(), novo_obstaculo()]
+
+bolinha = nova_bolinha(obstaculos)
 
 placar = 0
 
@@ -53,7 +68,7 @@ def mostrar_game_over():
     pygame.display.update()
 
 def mostrar_placar(placar):
-    fonte = pygame.font.SysFont(None, 35)
+    fonte = pygame.font.SysFont(None, 25)
     texto = fonte.render("Pontos: "+ str(placar), True, BRANCO)
     tela.blit(texto, [0, 0])
 
@@ -116,10 +131,13 @@ while rodando:
         rodando = False
 
     if cobra[0] == bolinha:
-        bolinha = nova_bolinha()
+        bolinha = nova_bolinha(obstaculos)
         placar += 1
+        obstaculos.append (novo_obstaculo())
     else:
         cobra.pop()
+
+    
 
     for obstaculo in obstaculos:
         for bloco in obstaculo:
@@ -142,9 +160,13 @@ while rodando:
     # Desenhar a bolinha
     pygame.draw.rect(tela, VERMELHO, pygame.Rect(bolinha[0], bolinha[1], 20, 20))
 
-    for i in range(3):  # Itera pelos grupos de obstáculos
-        for j in range(3):  # Itera pelos blocos de cada obstáculo
-            pygame.draw.rect(tela, BRANCO, pygame.Rect(*obstaculos[i][j], 20, 20))
+
+    for obstaculo in obstaculos:  
+        for bloco in obstaculo:  
+            pygame.draw.rect(tela, CINZA, pygame.Rect(*bloco, 20, 20)) # BORDA MAIS ESCURA
+    for obstaculo in obstaculos:  # Itera pelos grupos de obstáculos
+        for bloco in obstaculo:  # Itera pelos blocos de cada obstáculo
+            pygame.draw.rect(tela, BRANCO, pygame.Rect(bloco[0]+4, bloco[1]+4, 12, 12))
 
 
     # Atualizar a tela
