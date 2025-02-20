@@ -42,6 +42,8 @@ def novo_obstaculo():
 bolinha = nova_bolinha()
 obstaculos = [novo_obstaculo(), novo_obstaculo(), novo_obstaculo()]
 
+placar = 0
+
 clock = pygame.time.Clock()
 
 def mostrar_game_over():
@@ -49,6 +51,8 @@ def mostrar_game_over():
     texto = fonte.render("GAME OVER!", True, VERMELHO)
     tela.blit(texto, [largura_tela // 3, altura_tela // 2])
     pygame.display.update()
+
+
 
 # Função para desenhar a cobra com afinamento
 def desenhar_cobra(cobra):
@@ -110,12 +114,16 @@ while rodando:
 
     if cobra[0] == bolinha:
         bolinha = nova_bolinha()
-    elif cobra[0] in obstaculos:
-        mostrar_game_over()
-        pygame.time.wait(2000)  # Esperar 2 segundos antes de sair
-        rodando = False
+        placar = +1
     else:
         cobra.pop()
+
+    for obstaculo in obstaculos:
+        for bloco in obstaculo:
+            if cobra[0] == bloco:
+                mostrar_game_over()
+                pygame.time.wait(2000)  # Esperar 2 segundos antes de sair
+                rodando = False
     
 
     # Marcar que o primeiro movimento aconteceu
@@ -132,7 +140,7 @@ while rodando:
 
     for i in range(3):  # Itera pelos grupos de obstáculos
         for j in range(3):  # Itera pelos blocos de cada obstáculo
-            pygameC:\Users\lanam\OneDrive\Área de Trabalho\UFLA\VScode\Python\SnakeGame.py.draw.rect(tela, BRANCO, pygame.Rect(*obstaculos[i][j], 20, 20))
+            pygame.draw.rect(tela, BRANCO, pygame.Rect(*obstaculos[i][j], 20, 20))
 
 
     # Atualizar a tela
