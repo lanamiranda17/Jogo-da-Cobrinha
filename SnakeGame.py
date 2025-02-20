@@ -13,7 +13,7 @@ BRANCO = (255, 255, 255)
 VERDE = (0, 255, 0)
 VERDE_ESCURO = (0, 150, 0)  # Cor mais escura para a sombra
 VERMELHO = (255, 0, 0)
-CINZA = (128, 128, 128)
+CINZA = (211, 211, 211)
 
 cobra = [(200, 200), (220, 200), (240, 200)]  # Posição inicial da cobra
 
