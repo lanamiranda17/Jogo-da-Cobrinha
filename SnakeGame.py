@@ -1,116 +1,120 @@
 import pygame
 import random
-
-# Inicializa o Pygame
 pygame.init()
 
-# Dimensões da tela
-WIDTH, HEIGHT = 600, 600
-CELL_SIZE = 20  # Tamanho de cada "célula" do jogo
+largura_tela = 500
+altura_tela = 500
+tela = pygame.display.set_mode((largura_tela, altura_tela))
 
-# Define as cores em RGB
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-
-# Cria a janela do jogo
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
 
-# Controla a taxa de atualização do jogo
+PRETO = (0, 0, 0)
+BRANCO = (255, 255, 255)
+VERDE = (0, 255, 0)
+VERDE_ESCURO = (0, 150, 0)  # Cor mais escura para a sombra
+VERMELHO = (255, 0, 0)
+
+cobra = [(200, 200), (220, 200), (240, 200)]  # Posição inicial da cobra
+
+# Atualizações de posição
+novo_x = 20
+novo_y = 0
+
+def nova_bolinha():
+    return (random.randrange(0, largura_tela, 20), random.randrange(0, altura_tela, 20))
+
+bolinha = nova_bolinha()
+
 clock = pygame.time.Clock()
 
-# Função para desenhar a cobra e a comida
-def draw_snake(snake_body):
-    for segment in snake_body:
-        pygame.draw.rect(screen, GREEN, (segment[0], segment[1], CELL_SIZE, CELL_SIZE))
+def mostrar_game_over():
+    fonte = pygame.font.SysFont(None, 40)
+    texto = fonte.render("GAME OVER!", True, VERMELHO)
+    tela.blit(texto, [largura_tela // 3, altura_tela // 2])
+    pygame.display.update()
 
-def draw_food(x, y):
-    pygame.draw.rect(screen, RED, (x, y, CELL_SIZE, CELL_SIZE))
+# Função para desenhar a cobra com afinamento
+def desenhar_cobra(cobra):
+    for i, bloco in enumerate(cobra):
+        tamanho = 20 - i  # O tamanho vai diminuindo com o aumento do índice (afunilamento)
+        if tamanho < 5:  # Largura e altura mínima para evitar que a cobra desapareça
+            tamanho = 5
 
-def main():
-    # Posição inicial da cobra (centro da tela)
-    snake_x = WIDTH // 2
-    snake_y = HEIGHT // 2
-    
-    # Velocidade inicial (cobra parada)
-    snake_dx = 0
-    snake_dy = 0
-    
-    # Corpo da cobra (lista de coordenadas)
-    snake_body = [(snake_x, snake_y)]
-    snake_length = 1
-    
-    # Gera posição inicial da comida em coordenadas múltiplas de CELL_SIZE
-    food_x = random.randrange(0, WIDTH, CELL_SIZE)
-    food_y = random.randrange(0, HEIGHT, CELL_SIZE)
-    
-    # Loop principal do jogo
-    running = True
-    while running:
-        clock.tick(10)  # A cobra se move ~10 vezes por segundo
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            
-            # Controle da cobra pelas setas do teclado
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP and snake_dy == 0:
-                    snake_dx = 0
-                    snake_dy = -CELL_SIZE
-                elif event.key == pygame.K_DOWN and snake_dy == 0:
-                    snake_dx = 0
-                    snake_dy = CELL_SIZE
-                elif event.key == pygame.K_LEFT and snake_dx == 0:
-                    snake_dx = -CELL_SIZE
-                    snake_dy = 0
-                elif event.key == pygame.K_RIGHT and snake_dx == 0:
-                    snake_dx = CELL_SIZE
-                    snake_dy = 0
-        
-        # Atualiza a posição da cobra
-        snake_x += snake_dx
-        snake_y += snake_dy
-        
-        # Verifica se a cobra bateu nas paredes (Game Over)
-        if snake_x < 0 or snake_x >= WIDTH or snake_y < 0 or snake_y >= HEIGHT:
-            running = False
-        
-        # Adiciona a nova posição da cabeça da cobra
-        snake_body.insert(0, (snake_x, snake_y))
-        
-        # Verifica se a cobra comeu a comida
-        if snake_x == food_x and snake_y == food_y:
-            # Gera nova comida
-            food_x = random.randrange(0, WIDTH, CELL_SIZE)
-            food_y = random.randrange(0, HEIGHT, CELL_SIZE)
-            snake_length += 1
-        else:
-            # Remove o último segmento se não comer
-            snake_body.pop()
-        
-        # Verifica colisão com o próprio corpo (Game Over)
-        if len(snake_body) != len(set(snake_body)):
-            # Se houver posições duplicadas no corpo, houve colisão
-            running = False
-        
-        # Desenha o fundo
-        screen.fill(BLACK)
-        
-        # Desenha a comida
-        draw_food(food_x, food_y)
-        
-        # Desenha a cobra
-        draw_snake(snake_body)
-        
-        # Atualiza a tela
-        pygame.display.update()
-    
-    # Finaliza o jogo
-    pygame.quit()
+        # Desenha a borda escura mais espessa
+        borda_espessura = 4  # Aumentando a espessura da borda
+        pygame.draw.rect(tela, VERDE_ESCURO, pygame.Rect(bloco[0], bloco[1], tamanho, tamanho))
+        pygame.draw.rect(tela, VERDE, pygame.Rect(bloco[0] + borda_espessura, bloco[1] + borda_espessura, tamanho - 2 * borda_espessura, tamanho - 2 * borda_espessura))
 
-# Executa o jogo
-if __name__ == "__main__":
-    main()
+
+
+
+
+# Loop principal
+rodando = True
+primeiro_movimento = True  # Flag para garantir que o "Game Over" só apareça após o primeiro movimento
+while rodando:
+    # Verificar eventos
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # Fechar o jogo
+            rodando = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT and novo_x == 0:
+                novo_x = -20
+                novo_y = 0
+            elif event.key == pygame.K_RIGHT and novo_x == 0:
+                novo_x = +20
+                novo_y = 0
+            elif event.key == pygame.K_UP and novo_y == 0:
+                novo_y = -20
+                novo_x = 0
+            elif event.key == pygame.K_DOWN and novo_y == 0:
+                novo_y = +20
+                novo_x = 0
+
+    # Atualização do movimento
+    nova_cabeca = (cobra[0][0] + novo_x, cobra[0][1] + novo_y)
+    cobra.insert(0, nova_cabeca)
+
+    cabeca_x, cabeca_y = cobra[0]
+
+    if cabeca_x >= largura_tela:
+        cabeca_x = 0
+    elif cabeca_x < 0:
+        cabeca_x = largura_tela - 20
+
+    if cabeca_y >= altura_tela:
+        cabeca_y = 0
+    elif cabeca_y < 0:
+        cabeca_y = altura_tela - 20
+
+    cobra[0] = (cabeca_x, cabeca_y)
+    
+    # Verificar colisão com o corpo (após o primeiro movimento)
+    if not primeiro_movimento and cobra[0] in cobra[1:]:
+        mostrar_game_over()
+        pygame.time.wait(2000)  # Esperar 2 segundos antes de sair
+        rodando = False
+
+    if cobra[0] == bolinha:
+        bolinha = nova_bolinha()
+    else:
+        cobra.pop()
+
+    # Marcar que o primeiro movimento aconteceu
+    primeiro_movimento = False
+
+    # Preencher a tela com uma cor
+    tela.fill(PRETO)
+
+    # Desenhar a cobra
+    desenhar_cobra(cobra)
+
+    # Desenhar a bolinha
+    pygame.draw.rect(tela, VERMELHO, pygame.Rect(bolinha[0], bolinha[1], 20, 20))
+
+    # Atualizar a tela
+    pygame.display.update()
+    clock.tick(10)  # Número de quadros por segundo (FPS)
+
+# Sair do pygame
+pygame.quit()
