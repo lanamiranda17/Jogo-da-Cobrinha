@@ -23,7 +23,24 @@ novo_y = 0
 def nova_bolinha():
     return (random.randrange(0, largura_tela, 20), random.randrange(0, altura_tela, 20))
 
+def novo_obstaculo():
+    
+    x = random.randrange(0, largura_tela, 20)
+    y = random.randrange(0, altura_tela, 20)
+
+    forma = random.choice([0,1,2])
+
+    if forma == 0:
+        obstaculos = [(x,y), (x+20,y), (x+40, y)]
+    elif forma == 1:
+        obstaculos = [(x,y), (x, y+20), (x, y+40)]
+    else: 
+        obstaculos = [(x,y), (x+20, y), (x, y+20)]
+
+    return obstaculos
+
 bolinha = nova_bolinha()
+obstaculos = [novo_obstaculo(), novo_obstaculo(), novo_obstaculo()]
 
 clock = pygame.time.Clock()
 
@@ -44,10 +61,6 @@ def desenhar_cobra(cobra):
         borda_espessura = 4  # Aumentando a espessura da borda
         pygame.draw.rect(tela, VERDE_ESCURO, pygame.Rect(bloco[0], bloco[1], tamanho, tamanho))
         pygame.draw.rect(tela, VERDE, pygame.Rect(bloco[0] + borda_espessura, bloco[1] + borda_espessura, tamanho - 2 * borda_espessura, tamanho - 2 * borda_espessura))
-
-
-
-
 
 # Loop principal
 rodando = True
@@ -97,8 +110,13 @@ while rodando:
 
     if cobra[0] == bolinha:
         bolinha = nova_bolinha()
+    elif cobra[0] in obstaculos:
+        mostrar_game_over()
+        pygame.time.wait(2000)  # Esperar 2 segundos antes de sair
+        rodando = False
     else:
         cobra.pop()
+    
 
     # Marcar que o primeiro movimento aconteceu
     primeiro_movimento = False
@@ -111,6 +129,11 @@ while rodando:
 
     # Desenhar a bolinha
     pygame.draw.rect(tela, VERMELHO, pygame.Rect(bolinha[0], bolinha[1], 20, 20))
+
+    for i in range(3):  # Itera pelos grupos de obstáculos
+        for j in range(3):  # Itera pelos blocos de cada obstáculo
+            pygameC:\Users\lanam\OneDrive\Área de Trabalho\UFLA\VScode\Python\SnakeGame.py.draw.rect(tela, BRANCO, pygame.Rect(*obstaculos[i][j], 20, 20))
+
 
     # Atualizar a tela
     pygame.display.update()
