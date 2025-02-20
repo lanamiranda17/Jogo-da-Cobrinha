@@ -52,7 +52,10 @@ def mostrar_game_over():
     tela.blit(texto, [largura_tela // 3, altura_tela // 2])
     pygame.display.update()
 
-
+def mostrar_placar(placar):
+    fonte = pygame.font.SysFont(None, 35)
+    texto = fonte.render("Pontos: "+ str(placar), True, BRANCO)
+    tela.blit(texto, [0, 0])
 
 # Função para desenhar a cobra com afinamento
 def desenhar_cobra(cobra):
@@ -114,7 +117,7 @@ while rodando:
 
     if cobra[0] == bolinha:
         bolinha = nova_bolinha()
-        placar = +1
+        placar += 1
     else:
         cobra.pop()
 
@@ -134,6 +137,7 @@ while rodando:
 
     # Desenhar a cobra
     desenhar_cobra(cobra)
+    mostrar_placar(placar)
 
     # Desenhar a bolinha
     pygame.draw.rect(tela, VERMELHO, pygame.Rect(bolinha[0], bolinha[1], 20, 20))
